@@ -19,15 +19,19 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
+
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
               }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
-             'number_rooms': int, 'number_bathrooms': int,
-             'max_guest': int, 'price_by_night': int,
-             'latitude': float, 'longitude': float
+                'email': str, 'password': str, 'first_name': str,
+                'last_name': str, 'place_id': str, 'description': str,
+                'city_id': str, 'user_id': str, 'name': str, 'text': str,
+                'number_rooms': int, 'number_bathrooms': int,
+                'max_guest': int, 'price_by_night': int,
+                'latitude': float, 'longitude': float
             }
 
     def preloop(self):
@@ -68,12 +72,14 @@ class HBNBCommand(cmd.Cmd):
                 _id = pline[0].replace('\"', '')
                 # possible bug here:
                 # empty quotes register as empty _id when replaced
-
+                if not _id:
+                    print("** instance id missing **")
+                    return
                 # if arguments exist beyond _id
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] == '{' and pline[-1] == '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -114,17 +120,75 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        """ Create an object of any class"""
+        """ Create an object of any class
+        updated to handle initial parameters
+        """
+        clss_name = item_key = item_value = ''
+        item_dict = {}
         if not args:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+
+        # isolate classname from args
+        # ex: ("classname", " ", "<name>=<value> <name>=<value> ...")
+        new_args = args.partition(" ")
+
+        # check if class exists
+        clss_name = new_args[0]
+        if clss_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+
+        if new_args[2]:  # check for initialization parameters
+            # isolate each name=value item in the string
+            # ex: [<name>=<value>, <name>=<value>, ...]
+            argslist = []
+            [argslist.append(x) for x in new_args[2].split(" ")]
+
+            # split each name=value item at the assignment operator
+            # ex: [<name>, <value>, ...]
+            key_value_list = []
+            for y in argslist:
+                sublist = y.split("=")
+                if len(sublist) == 2:  # ensure each pair is complete
+                    for z in sublist:
+                        key_value_list.append(z)
+                else:
+                    if sublist[0] in HBNBCommand.types:  # missing a value
+                        print(("** value missing **"))
+                        return
+                    else:  # missing an attribute name
+                        print(("** attribute name missing **"))
+                        return
+
+            for j, item_key in enumerate(key_value_list):
+                # Iterate in steps of even indices, note that 0 % 2 == 0
+                if j % 2 == 0:
+                    item_value = key_value_list[j + 1]
+                    if not item_key:
+                        print(("** attribute name missing **"))
+                        return
+                    if not item_value:
+                        print(("** value missing **"))
+                        return
+                    if item_key in HBNBCommand.types:
+                        item_value = item_value.strip('\"').replace('_', " ")
+                        item_value = HBNBCommand.types[item_key](item_value)
+                        item_dict[item_key] = item_value
+            new_instance = HBNBCommand.classes[clss_name]()
+            print(new_instance.id)
+            instance_key = clss_name + "." + new_instance.id
+            for k, v in item_dict.items():
+                new_instance.__dict__.update({k: v})
+                setattr(storage._FileStorage__objects[instance_key], k, v)
+            storage.save()
+            return
+        else:
+            new_instance = HBNBCommand.classes[clss_name]()
+            storage.save()
+            print(new_instance.id)
+            storage.save()
+            return
 
     def help_create(self):
         """ Help information for the create method """
@@ -272,7 +336,7 @@ class HBNBCommand(cmd.Cmd):
                 args.append(v)
         else:  # isolate args
             args = args[2]
-            if args and args[0] is '\"':  # check for quoted arg
+            if args and args[0] == '\"':  # check for quoted arg
                 second_quote = args.find('\"', 1)
                 att_name = args[1:second_quote]
                 args = args[second_quote + 1:]
@@ -280,10 +344,10 @@ class HBNBCommand(cmd.Cmd):
             args = args.partition(' ')
 
             # if att_name was not quoted arg
-            if not att_name and args[0] is not ' ':
+            if not att_name and args[0] != ' ':
                 att_name = args[0]
             # check for quoted val arg
-            if args[2] and args[2][0] is '\"':
+            if args[2] and args[2][0] == '\"':
                 att_val = args[2][1:args[2].find('\"', 1)]
 
             # if att_val was not quoted arg
@@ -319,6 +383,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
