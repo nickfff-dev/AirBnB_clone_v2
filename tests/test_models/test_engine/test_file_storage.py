@@ -105,5 +105,21 @@ class test_fileStorage(unittest.TestCase):
     def test_storage_var_created(self):
         """ FileStorage object storage created """
         from models.engine.file_storage import FileStorage
-        print(type(storage))
         self.assertEqual(type(storage), FileStorage)
+
+    def test_all_without_cls(self):
+        """ Test that delete removes an object from storage """
+        new = BaseModel()
+        storage.new(new)
+        storage.save()
+        self.assertGreaterEqual(len(storage.all()), 1)
+
+    def test_delete(self):
+        """ Test that delete removes an object from storage """
+        new = BaseModel()
+        storage.new(new)
+        storage.save()
+        _id = new.to_dict()['id']
+        key = "{}.{}".format('BaseModel', _id)
+        storage.delete(new)
+        self.assertNotIn(key, storage.all())
