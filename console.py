@@ -155,10 +155,10 @@ class HBNBCommand(cmd.Cmd):
                         key_value_list.append(z)
                 else:
                     if sublist[0] in HBNBCommand.types:  # missing a value
-                        print(("** value missing **"))
+                        print("** value missing **")
                         return
                     else:  # missing an attribute name
-                        print(("** attribute name missing **"))
+                        print("** attribute name missing **")
                         return
 
             for j, item_key in enumerate(key_value_list):
@@ -166,10 +166,10 @@ class HBNBCommand(cmd.Cmd):
                 if j % 2 == 0:
                     item_value = key_value_list[j + 1]
                     if not item_key:
-                        print(("** attribute name missing **"))
+                        print("** attribute name missing **")
                         return
                     if not item_value:
-                        print(("** value missing **"))
+                        print("** value missing **")
                         return
                     if item_key in HBNBCommand.types:
                         item_value = item_value.strip('\"').replace('_', " ")
