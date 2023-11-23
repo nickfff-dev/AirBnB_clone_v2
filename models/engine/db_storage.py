@@ -27,9 +27,10 @@ class DBStorage:
         """Query all objects of a class. If cls=None, query all types"""
         from models.state import State
         from models.city import City
+        from models.user import User
 
         obj_dict = {}
-        classes = {'State': State, 'City': City}
+        classes = {'State': State, 'City': City, 'User': User}
 
         if cls:
             objs = self.__session.query(classes[cls]).all()
@@ -61,6 +62,7 @@ class DBStorage:
         """Reload all tables in the database"""
         from models.state import State
         from models.city import City
+        from models.user import User
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
