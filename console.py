@@ -29,7 +29,8 @@ class HBNBCommand(cmd.Cmd):
                 'email': str, 'password': str, 'first_name': str,
                 'last_name': str, 'place_id': str, 'description': str,
                 'city_id': str, 'user_id': str, 'name': str, 'text': str,
-                'number_rooms': int, 'number_bathrooms': int,
+                'state_id': str,
+                'number_rooms': int, 'number_bathrooms': int, "id": str,
                 'max_guest': int, 'price_by_night': int,
                 'latitude': float, 'longitude': float
             }
@@ -144,7 +145,6 @@ class HBNBCommand(cmd.Cmd):
             # ex: [<name>=<value>, <name>=<value>, ...]
             argslist = []
             [argslist.append(x) for x in new_args[2].split(" ")]
-
             # split each name=value item at the assignment operator
             # ex: [<name>, <value>, ...]
             key_value_list = []
@@ -177,11 +177,9 @@ class HBNBCommand(cmd.Cmd):
                         item_dict[item_key] = item_value
             new_instance = HBNBCommand.classes[clss_name]()
             print(new_instance.id)
-            instance_key = clss_name + "." + new_instance.id
             for k, v in item_dict.items():
                 new_instance.__dict__.update({k: v})
-                setattr(storage._FileStorage__objects[instance_key], k, v)
-            storage.save()
+            new_instance.save()
             return
         else:
             new_instance = HBNBCommand.classes[clss_name]()
@@ -219,7 +217,7 @@ class HBNBCommand(cmd.Cmd):
 
         key = c_name + "." + c_id
         try:
-            print(storage._FileStorage__objects[key])
+            print(storage.all()[key])
         except KeyError:
             print("** no instance found **")
 
@@ -264,19 +262,19 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
-
+        classes = {'State': State, 'City': City, 'User': User,
+                   'Place': Place, 'Review': Review, 'Amenity': Amenity}
         if args:
             args = args.split(' ')[0]  # remove possible trailing args
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
+            for k, v in storage.all(args).items():
                 if k.split('.')[0] == args:
                     print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
+            for k, v in storage.all().items():
                 print_list.append(str(v))
-
         print(print_list)
 
     def help_all(self):
@@ -287,7 +285,7 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Count current number of class instances"""
         count = 0
-        for k, v in storage._FileStorage__objects.items():
+        for k, v in storage.all().items():
             if args == k.split('.')[0]:
                 count += 1
         print(count)
