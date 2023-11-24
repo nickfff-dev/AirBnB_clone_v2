@@ -28,9 +28,10 @@ class DBStorage:
         from models.state import State
         from models.city import City
         from models.user import User
+        from models.place import Place
 
         obj_dict = {}
-        classes = {'State': State, 'City': City, 'User': User}
+        classes = {'State': State, 'City': City, 'User': User, 'Place': Place}
 
         if cls:
             objs = self.__session.query(classes[cls]).all()
@@ -63,6 +64,7 @@ class DBStorage:
         from models.state import State
         from models.city import City
         from models.user import User
+        from models.place import Place
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
