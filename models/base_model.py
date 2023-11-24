@@ -35,7 +35,7 @@ class BaseModel:
                 self.created_at = datetime.strptime(self.created_at,
                                                     '%Y-%m-%dT%H:%M:%S.%f')
             if type(self.updated_at) is str:
-                self.updated_at = datetime.strptime(self.created_at,
+                self.updated_at = datetime.strptime(self.updated_at,
                                                     '%Y-%m-%dT%H:%M:%S.%f')
 
     def __str__(self):
