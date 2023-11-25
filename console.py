@@ -10,6 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+import os
 
 
 class HBNBCommand(cmd.Cmd):
@@ -261,16 +262,19 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
-        classes = {'State': State, 'City': City, 'User': User,
-                   'Place': Place, 'Review': Review, 'Amenity': Amenity}
         if args:
             args = args.split(' ')[0]  # remove possible trailing args
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage.all(args).items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            if os.getenv('HBNB_TYPE_STORAGE') != 'db':
+                for k, v in storage.all(HBNBCommand.classes[args]).items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
+            else:
+                for k, v in storage.all(args).items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
         else:
             for k, v in storage.all().items():
                 print_list.append(str(v))
@@ -290,7 +294,7 @@ class HBNBCommand(cmd.Cmd):
         print(count)
 
     def help_count(self):
-        """ """
+        """ help function"""
         print("Usage: count <class_name>")
 
     def do_update(self, args):

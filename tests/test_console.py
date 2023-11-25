@@ -4,13 +4,15 @@ import unittest
 from console import HBNBCommand
 from unittest.mock import patch
 from io import StringIO
+from os import getenv
 
 
 class TestConsole(unittest.TestCase):
     """
     Test cases for the console
     """
-
+    @unittest.skipIf(
+            getenv('HBNB_TYPE_STORAGE') == 'db', 'FileStorage test')
     def test_do_create(self):
         """
         Test the do_create method

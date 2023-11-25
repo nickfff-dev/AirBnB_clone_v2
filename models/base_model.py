@@ -30,6 +30,8 @@ class BaseModel:
         for key, value in kwargs.items():
             if key == '__class__':
                 continue
+            if not hasattr(self, key):
+                raise KeyError(f"{key} is not a valid attribute")
             setattr(self, key, value)
             if type(self.created_at) is str:
                 self.created_at = datetime.strptime(self.created_at,
