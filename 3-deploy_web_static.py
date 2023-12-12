@@ -12,6 +12,7 @@ env.hosts = ['52.3.245.73', '18.204.20.55']
 env.user = 'ubuntu'
 env.key_filename = '~/.ssh/school'
 
+
 def do_pack():
     """
     Generates a .tgz archive from the contents of the web_static folder
@@ -54,13 +55,3 @@ def do_deploy(archive_path):
         return True
     except Exception:
         return False
-
-
-def deploy():
-    """ Creates and distributes an archive to your web servers,
-    using the function deploy.
-    """
-    archive_path = do_pack()
-    if archive_path is None:
-        return False
-    return do_deploy(archive_path)
