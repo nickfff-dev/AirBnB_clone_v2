@@ -1,9 +1,11 @@
 #!/usr/bin/python3
+
+
 """ This module defines a flask basic app """
 from flask import Flask
-
-
 app = Flask(__name__)
+
+
 @app.route("/", strict_slashes=False)
 def hello_hbnb():
     """ Method for simple server """
