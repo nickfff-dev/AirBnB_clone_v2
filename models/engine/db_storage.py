@@ -1,9 +1,20 @@
 #!/usr/bin/python3
 """This module defines a DBStorage class"""
+import models
+from models.base_model import Base
+from models.state import State
+from models.city import City
+from models.user import User
+from models.place import Place
+from models.review import Review
+from models.amenity import Amenity
 from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
+
+
+classes = {'State': State, 'City': City, 'User': User,
+           'Place': Place, 'Review': Review, 'Amenity': Amenity}
 
 
 class DBStorage:
@@ -25,28 +36,14 @@ class DBStorage:
 
     def all(self, cls=None):
         """Query all objects of a class. If cls=None, query all types"""
-        from models.state import State
-        from models.city import City
-        from models.user import User
-        from models.place import Place
-        from models.review import Review
-        from models.amenity import Amenity
         obj_dict = {}
-        classes = {'State': State, 'City': City, 'User': User,
-                   'Place': Place, 'Review': Review, 'Amenity': Amenity}
-
-        if cls:
-            objs = self.__session.query(classes[cls]).all()
-            for obj in objs:
-                key = '{}.{}'.format(cls, obj.id)
-                obj_dict[key] = obj.to_dict()
-        else:
-            for cls in classes.values():
-                objs = self.__session.query(cls).all()
+        for clss in classes:
+            if cls is None or cls is classes[clss] or cls is clss:
+                objs = self.__session.query(classes[clss]).all()
                 for obj in objs:
-                    key = '{}.{}'.format(type(obj).__name__, obj.id)
+                    key = '{}.{}'.format(obj.__class__.__name__, obj.id)
                     obj_dict[key] = obj.to_dict()
-        return obj_dict
+        return (obj_dict)
 
     def new(self, obj):
         """Add the object to the current database session"""
@@ -63,15 +60,13 @@ class DBStorage:
 
     def reload(self):
         """Reload all tables in the database"""
-        from models.state import State
-        from models.city import City
-        from models.user import User
-        from models.place import Place
-        from models.review import Review
-        from models.amenity import Amenity
 
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
+
+    def close(self):
+        """Close the session"""
+        self.__session.remove()

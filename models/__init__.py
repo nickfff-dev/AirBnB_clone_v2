@@ -3,12 +3,14 @@
 of class FileStorage or DBStorage
 """
 from os import getenv
-from models.engine.file_storage import FileStorage
-from models.engine.db_storage import DBStorage
 
-if getenv('HBNB_TYPE_STORAGE') == 'db':
+
+what_storage = getenv('HBNB_TYPE_STORAGE')
+if what_storage == 'db':
+    from models.engine.db_storage import DBStorage
     storage = DBStorage()
 else:
+    from models.engine.file_storage import FileStorage
     storage = FileStorage()
 
 storage.reload()

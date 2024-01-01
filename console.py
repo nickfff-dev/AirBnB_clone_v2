@@ -2,8 +2,8 @@
 """ Console Module """
 import cmd
 import sys
+import models
 from models.base_model import BaseModel
-from models.__init__ import storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -173,13 +173,11 @@ class HBNBCommand(cmd.Cmd):
                         print("** value missing **")
                         return
                     if item_key in HBNBCommand.types:
-                        item_value = item_value.strip('\"').replace('_', " ")
+                        item_value = item_value.strip('\"\'').replace('_', " ")
                         item_value = HBNBCommand.types[item_key](item_value)
                         item_dict[item_key] = item_value
-            new_instance = HBNBCommand.classes[clss_name]()
+            new_instance = HBNBCommand.classes[clss_name](**item_dict)
             print(new_instance.id)
-            for k, v in item_dict.items():
-                new_instance.__dict__.update({k: v})
             new_instance.save()
             return
         else:
@@ -217,7 +215,7 @@ class HBNBCommand(cmd.Cmd):
 
         key = c_name + "." + c_id
         try:
-            print(storage.all()[key])
+            print(models.storage.all()[key])
         except KeyError:
             print("** no instance found **")
 
@@ -249,8 +247,8 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
-            storage.save()
+            del(models.storage.all()[key])
+            models.storage.save()
         except KeyError:
             print("** no instance found **")
 
@@ -267,17 +265,13 @@ class HBNBCommand(cmd.Cmd):
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            if os.getenv('HBNB_TYPE_STORAGE') != 'db':
-                for k, v in storage.all(HBNBCommand.classes[args]).items():
-                    if k.split('.')[0] == args:
-                        print_list.append(str(v))
-            else:
-                for k, v in storage.all(args).items():
-                    if k.split('.')[0] == args:
-                        print_list.append(str(v))
+            obj_dict = models.storage.all(HBNBCommand.classes[args])
+            for key in obj_dict:
+                print_list.append(str(obj_dict[key]))
         else:
-            for k, v in storage.all().items():
-                print_list.append(str(v))
+            obj_dict = models.storage.all()
+            for key in obj_dict:
+                print_list.append(str(obj_dict[key]))
         print(print_list)
 
     def help_all(self):
@@ -288,7 +282,7 @@ class HBNBCommand(cmd.Cmd):
     def do_count(self, args):
         """Count current number of class instances"""
         count = 0
-        for k, v in storage.all().items():
+        for k, v in models.storage.all().items():
             if args == k.split('.')[0]:
                 count += 1
         print(count)
@@ -324,7 +318,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         # determine if key is present
-        if key not in storage.all():
+        if key not in models.storage.all():
             print("** no instance found **")
             return
 
@@ -358,7 +352,7 @@ class HBNBCommand(cmd.Cmd):
             args = [att_name, att_val]
 
         # retrieve dictionary of current objects
-        new_dict = storage.all()[key]
+        new_dict = models.storage.all()[key]
 
         # iterate through attr names and values
         for i, att_name in enumerate(args):
