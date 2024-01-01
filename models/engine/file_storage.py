@@ -27,9 +27,9 @@ class FileStorage:
         """ updated to take additional optional variable cls
             to return the list of objects of one type of class.
         """
-        if cls:
+        if cls is not None:
             return {k: v for k, v in self.__objects.items()
-                    if cls.__name__ in k}
+                    if cls == v.__class__ or cls == v.__class__.__name__}
         else:
             return self.__objects
 

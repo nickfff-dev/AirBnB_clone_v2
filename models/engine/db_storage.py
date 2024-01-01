@@ -43,8 +43,8 @@ class DBStorage:
                 objs = self.__session.query(classes[clss]).all()
                 for obj in objs:
                     key = '{}.{}'.format(obj.__class__.__name__, obj.id)
-                    obj_dict[key] = obj.to_dict()
-        return obj_dict
+                    obj_dict[key] = obj
+        return (obj_dict)
 
     def new(self, obj):
         """Add the object to the current database session"""
