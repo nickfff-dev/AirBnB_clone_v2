@@ -12,6 +12,7 @@ app = Flask(__name__)
 def cities_states_list():
     """ Method for query cities by states """
     states = models.storage.all(State).values()
+    states = sorted(states, key=lambda k: k.name)
     return render_template('8-cities_by_states.html', states=states)
 
 

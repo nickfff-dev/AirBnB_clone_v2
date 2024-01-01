@@ -12,8 +12,8 @@ class State(BaseModel, Base):
     if models.what_storage == 'db':
         __tablename__ = 'states'
         name = Column(String(128), nullable=False)
-        cities = relationship('City', backref='state',
-                              cascade="delete, delete-orphan")
+        cities = relationship('City', backref='state', order_by=City.name,
+                              cascade="delete")
     else:
         name = ""
 
