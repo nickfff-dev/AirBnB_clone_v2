@@ -27,12 +27,8 @@ class BaseModel:
         """Instatntiates a new model"""
         if kwargs:
             for key, value in kwargs.items():
-                if key == '__class__':
-                    continue
-                if not hasattr(self, key) and key not in ['id', 'created_at',
-                                                          'updated_at']:
-                    raise KeyError(f"{key} is not a valid attribute")
-                setattr(self, key, value)
+                if key != '__class__':
+                    setattr(self, key, value)
             if kwargs.get("created_at", None) and type(self.created_at) is str:
                 self.created_at = datetime.strptime(kwargs['created_at'],
                                                     '%Y-%m-%dT%H:%M:%S.%f')
