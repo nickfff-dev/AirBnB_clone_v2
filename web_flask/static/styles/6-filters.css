@@ -13,7 +13,7 @@
 	float: left;
 	height: 100%;
 	width: 25%;
-
+    
 	line-height: 20px;
 	border-right: 1px solid #DDDDDD;
 }
@@ -37,17 +37,25 @@
 	margin-left: -1px;
 	margin-top: 8px;
 	padding: 25px 0px;
-
+   
 	border: 1px solid #DDDDDD;
 	border-radius: 4px;
 }
 
+.popover::-webkit-scrollbar {
+	visibility: hidden;
+}
+
 .locations:hover .popover {
 	display: inline-block;
+	position: relative;
+	z-index: 5000;
 }
 
 .filter_amenities:hover .popover {
 	display: inline-block;
+	position: relative;
+	z-index: 5000;
 }
 
 ul {
